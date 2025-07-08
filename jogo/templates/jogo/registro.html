@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Registro{% endblock %}
+
+{% block conteudo %}
+<section>
+  <h2>Criar Conta</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <label for="id_username">Nome de usuário</label>
+    {{ form.username }}
+
+    <label for="id_email">E-mail</label>
+    {{ form.email }}
+
+    <label for="id_senha">Senha</label>
+    {{ form.senha }}
+
+    <label for="id_confirmar_senha">Confirmar senha</label>
+    {{ form.confirmar_senha }}
+
+    <label>
+      {{ form.eh_professor }} Sou professor
+    </label>
+
+    <button type="submit" class="contrast">Registrar</button>
+  </form>
+  <p>Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
+</section>
+{% endblock %}

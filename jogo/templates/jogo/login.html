@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Login{% endblock %}
+
+{% block conteudo %}
+<section>
+  <h2>Entrar no Sistema</h2>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="contrast">Entrar</button>
+  </form>
+  <p>Não tem uma conta? <a href="{% url 'registro' %}">Registre-se aqui</a></p>
+</section>
+{% endblock %}

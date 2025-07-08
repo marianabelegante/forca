@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Bem-vindo ao Jogo da Forca{% endblock %}
+
+{% block conteudo %}
+<section class="container flow">
+  <h1>Bem-vindo ao Jogo da Forca</h1>
+  <p>Escolha como deseja jogar:</p>
+
+  <a href="#" class="contrast">Jogar como visitante</a>
+  <a href="{% url 'login' %}">Entrar</a>
+  <a href="{% url 'registro' %}">Criar conta</a>
+</section>
+{% endblock %}

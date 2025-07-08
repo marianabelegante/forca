@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8" />
+    <title>{% block titulo %}Jogo da Forca{% endblock %}</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.*/css/pico.min.css" />
+</head>
+<body>
+
+<nav>
+  <ul>
+    <li><a href="{% url 'home' %}">Início</a></li>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'temas' %}">Temas</a></li>
+      <li><a href="{% url 'palavras' %}">Palavras</a></li>
+      <li><a href="{% url 'logout' %}">Sair</a></li>
+    {% else %}
+      <li><a href="{% url 'login' %}">Entrar</a></li>
+      <li><a href="{% url 'registro' %}">Registrar</a></li>
+    {% endif %}
+  </ul>
+</nav>
+
+<main class="container">
+    {% block conteudo %}{% endblock %}
+</main>
+
+</body>
+</html>
