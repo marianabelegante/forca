@@ -19,13 +19,20 @@
         <input type="text" id="letra" name="letra" maxlength="1" required autofocus>
         <button type="submit">Enviar</button>
       </form>
-      <p>Letras usadas: {{ letras_usadas|join:", " }}</p>
+      <p>Letras usadas:
+        {% for letra in letras_usadas %}
+          <span style="margin-right: 5px; font-weight: bold;">{{ letra|upper }}</span>
+        {% empty %}
+          Nenhuma ainda.
+        {% endfor %}
+      </p>
     {% elif status == 'ganhou' %}
       <p>Parabéns! Você ganhou!</p>
-      <a href="{% url 'selecionar_jogo' %}">Voltar à seleção</a>
+      <a href="{% url 'selecionar_jogo' %}" style="display:inline-block; margin-top: 1em;">Jogar novamente</a>
     {% else %}
-      <p>Você perdeu. A palavra era: <strong>{{ jogo.palavra }}</strong></p>
-      <a href="{% url 'selecionar_jogo' %}">Tentar novamente</a>
+      <p>Você perdeu.</p>
+      <p>A palavra era: <strong>{{ palavra_original|upper }}</strong></p>
+      <a href="{% url 'selecionar_jogo' %}" style="display:inline-block; margin-top: 1em;">Tentar novamente</a>
     {% endif %}
   {% endif %}
 {% endblock %}

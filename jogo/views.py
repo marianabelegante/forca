@@ -189,11 +189,11 @@ class JogoDaForcaView(View):
         erros = jogo['erros']
         max_erros = jogo['max_erros']
 
-        # Palavra com letras visíveis e ocultas
         palavra_mostrada = ' '.join([l if l in acertos else '_' for l in palavra])
 
         return {
             'palavra_mostrada': palavra_mostrada,
+            'palavra_original': palavra,
             'status': status,
             'erros': erros,
             'max_erros': max_erros,
