@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Excluir palavra{% endblock %}
+
+{% block conteudo %}
+<section>
+  <h2>Confirmar exclusão</h2>
+  <p>Tem certeza que deseja excluir a palavra <strong>"{{ object.texto }}"</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="contrast">Sim, excluir</button>
+    <a href="{% url 'palavras' %}">Cancelar</a>
+  </form>
+</section>
+{% endblock %}

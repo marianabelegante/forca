@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Excluir tema{% endblock %}
+
+{% block conteudo %}
+<section>
+  <h2>Confirmar exclusão</h2>
+  <p>Tem certeza de que deseja excluir o tema <strong>"{{ object.nome }}"</strong>?</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="contrast">Sim, excluir</button>
+    <a href="{% url 'temas' %}">Cancelar</a>
+  </form>
+</section>
+{% endblock %}

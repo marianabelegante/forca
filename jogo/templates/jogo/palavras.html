@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Palavras cadastradas{% endblock %}
+
+{% block conteudo %}
+<section>
+  <h2>Palavras</h2>
+  <a href="{% url 'nova_palavra' %}" role="button">+ Nova Palavra</a>
+
+  {% if palavras %}
+    <table>
+      <thead>
+        <tr>
+          <th>Texto</th>
+          <th>Dica</th>
+          <th>Tema</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for palavra in palavras %}
+        <tr>
+          <td>{{ palavra.texto }}</td>
+          <td>{{ palavra.dica }}</td>
+          <td>{{ palavra.tema.nome }}</td>
+          <td>
+            <a href="{% url 'editar_palavra' palavra.pk %}">Editar</a> |
+            <a href="{% url 'excluir_palavra' palavra.pk %}">Excluir</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhuma palavra cadastrada ainda.</p>
+  {% endif %}
+</section>
+{% endblock %}
