@@ -1,9 +1,10 @@
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, TemplateView
+import random
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, TemplateView, View
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from .models import Tema, Palavra, Perfil
 from .forms import FormularioRegistro, FormularioTema, FormularioPalavra
 
@@ -20,9 +21,9 @@ class RegistroView(CreateView):
     def get_success_url(self):
         user = self.request.user
         if hasattr(user, 'perfil') and user.perfil.eh_professor:
-            return reverse_lazy('temas')  # professor vai pra lista de temas
+            return reverse_lazy('temas')  # Professor vai pra lista de temas
         else:
-            return reverse_lazy('home')  # aluno vai pra home ou tela de jogo
+            return reverse_lazy('selecionar_jogo')  # Aluno vai pra seleção do jogo
 
 
 # LOGIN
@@ -32,9 +33,9 @@ class LoginUsuarioView(LoginView):
     def get_success_url(self):
         user = self.request.user
         if hasattr(user, 'perfil') and user.perfil.eh_professor:
-            return reverse_lazy('temas')  # professor vai pra lista de temas
+            return reverse_lazy('temas')  # Professor vai pra lista de temas
         else:
-            return reverse_lazy('home')  # aluno vai pra home ou tela de jogo
+            return reverse_lazy('selecionar_jogo')  # Aluno vai pra seleção do jogo
 
 
 # LOGOUT
@@ -115,26 +116,86 @@ class PalavraDeleteView(LoginRequiredMixin, SomenteProfessorMixin, DeleteView):
     success_url = reverse_lazy('palavras')
 
 
-
 class SelecaoJogoView(TemplateView):
     template_name = 'jogo/selecao_jogo.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        professor_id = self.request.GET.get('professor')
-        tema_id = self.request.GET.get('tema')
-
-        context['professores'] = User.objects.filter(temas_criados__isnull=False).distinct()
-        context['temas'] = Tema.objects.all()
-
-        palavras = Palavra.objects.all()
-
-        if professor_id:
-            palavras = palavras.filter(tema__criado_por_id=professor_id)
-        if tema_id:
-            palavras = palavras.filter(tema_id=tema_id)
-
-        context['palavras'] = palavras
-        context['professor_selecionado'] = int(professor_id) if professor_id else None
-        context['tema_selecionado'] = int(tema_id) if tema_id else None
+        # Lista só temas com pelo menos uma palavra
+        context['temas'] = Tema.objects.filter(palavras__isnull=False).distinct()
         return context
+
+class JogoDaForcaView(View):
+    template_name = 'jogo/jogo_forca.html'
+
+    def get(self, request, tema_id):
+        # Pegando a palavra aleatória do tema
+        palavras = Palavra.objects.filter(tema_id=tema_id)
+        if not palavras.exists():
+            return render(request, self.template_name, {'erro': 'Nenhuma palavra disponível para este tema.'})
+
+        # Inicializar jogo se não existir na sessão ou tema mudou
+        if 'jogo' not in request.session or request.session.get('tema_id') != tema_id:
+            palavra = random.choice(list(palavras))
+            request.session['jogo'] = {
+                'palavra': palavra.texto.lower(),
+                'acertos': [],
+                'erros': 0,
+                'max_erros': 6,
+                'status': 'em_andamento'
+            }
+            request.session['tema_id'] = tema_id
+
+        contexto = self._criar_contexto(request)
+        return render(request, self.template_name, contexto)
+
+    def post(self, request, tema_id):
+        letra = request.POST.get('letra', '').lower()
+        jogo = request.session.get('jogo')
+
+        if not jogo or jogo['status'] != 'em_andamento':
+            return redirect('selecionar_jogo')
+
+        palavra = jogo['palavra']
+        acertos = set(jogo['acertos'])
+        erros = jogo['erros']
+        max_erros = jogo['max_erros']
+
+        if letra and letra.isalpha() and len(letra) == 1:
+            if letra in palavra and letra not in acertos:
+                acertos.add(letra)
+            elif letra not in palavra:
+                erros += 1
+
+        # Atualizar o status do jogo
+        if erros >= max_erros:
+            jogo['status'] = 'perdeu'
+        elif all(l in acertos for l in set(palavra)):
+            jogo['status'] = 'ganhou'
+
+        jogo['acertos'] = list(acertos)
+        jogo['erros'] = erros
+
+        request.session['jogo'] = jogo
+
+        contexto = self._criar_contexto(request)
+        return render(request, self.template_name, contexto)
+
+    def _criar_contexto(self, request):
+        jogo = request.session.get('jogo')
+        palavra = jogo['palavra']
+        acertos = set(jogo['acertos'])
+        status = jogo['status']
+        erros = jogo['erros']
+        max_erros = jogo['max_erros']
+
+        # Palavra com letras visíveis e ocultas
+        palavra_mostrada = ' '.join([l if l in acertos else '_' for l in palavra])
+
+        return {
+            'palavra_mostrada': palavra_mostrada,
+            'status': status,
+            'erros': erros,
+            'max_erros': max_erros,
+            'letras_usadas': acertos,
+        }

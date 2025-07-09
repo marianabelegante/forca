@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Jogo da Forca{% endblock %}
+
+{% block conteudo %}
+  <h2>Jogo da Forca</h2>
+
+  {% if erro %}
+    <p>{{ erro }}</p>
+  {% else %}
+    <p><strong>Palavra:</strong> {{ palavra_mostrada }}</p>
+    <p>Erros: {{ erros }} / {{ max_erros }}</p>
+    <p>Status: {{ status }}</p>
+
+    {% if status == 'em_andamento' %}
+      <form method="post">
+        {% csrf_token %}
+        <label for="letra">Digite uma letra:</label>
+        <input type="text" id="letra" name="letra" maxlength="1" required autofocus>
+        <button type="submit">Enviar</button>
+      </form>
+      <p>Letras usadas: {{ letras_usadas|join:", " }}</p>
+    {% elif status == 'ganhou' %}
+      <p>Parabéns! Você ganhou!</p>
+      <a href="{% url 'selecionar_jogo' %}">Voltar à seleção</a>
+    {% else %}
+      <p>Você perdeu. A palavra era: <strong>{{ jogo.palavra }}</strong></p>
+      <a href="{% url 'selecionar_jogo' %}">Tentar novamente</a>
+    {% endif %}
+  {% endif %}
+{% endblock %}

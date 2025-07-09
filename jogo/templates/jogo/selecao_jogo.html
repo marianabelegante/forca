@@ -1,47 +1,19 @@
 {% extends 'base.html' %}
 
-{% block titulo %}Selecionar jogo{% endblock %}
+{% block titulo %}Selecione o Tema para Jogar{% endblock %}
 
 {% block conteudo %}
 <section>
-  <h2>Escolha o jogo</h2>
+  <h2>Selecione o Tema</h2>
 
-  <form method="get" action=".">
-    <label for="professor">Filtrar por professor:</label>
-    <select name="professor" id="professor" onchange="this.form.submit()">
-      <option value="">-- Todos --</option>
-      {% for prof in professores %}
-        <option value="{{ prof.id }}" {% if professor_selecionado == prof.id %}selected{% endif %}>
-          {{ prof.username }}
-        </option>
-      {% endfor %}
-    </select>
-
-    <label for="tema">Filtrar por tema:</label>
-    <select name="tema" id="tema" onchange="this.form.submit()">
-      <option value="">-- Todos --</option>
-      {% for t in temas %}
-        <option value="{{ t.id }}" {% if tema_selecionado == t.id %}selected{% endif %}>
-          {{ t.nome }}
-        </option>
-      {% endfor %}
-    </select>
-  </form>
-
-  <hr />
-
-  <h3>Palavras disponíveis:</h3>
-  {% if palavras %}
+  {% if temas %}
     <ul>
-      {% for palavra in palavras %}
-        <li>
-          {{ palavra.texto }} (Tema: {{ palavra.tema.nome }}) -
-          <a href="{% url 'jogar' palavra.id %}">Jogar</a>
-        </li>
+      {% for tema in temas %}
+        <li><a href="{% url 'jogo_forca' tema.pk %}">{{ tema.nome }}</a></li>
       {% endfor %}
     </ul>
   {% else %}
-    <p>Nenhuma palavra encontrada para os filtros selecionados.</p>
+    <p>Nenhum tema disponível para jogar.</p>
   {% endif %}
 </section>
 {% endblock %}

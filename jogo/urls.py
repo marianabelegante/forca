@@ -13,6 +13,7 @@ from .views import (
     PalavraUpdateView,
     PalavraDeleteView,
     SelecaoJogoView,
+    JogoDaForcaView,
 )
 
 urlpatterns = [
@@ -36,4 +37,5 @@ urlpatterns = [
     path('palavras/<int:pk>/excluir/', PalavraDeleteView.as_view(), name='excluir_palavra'),
 
     path('selecionar_jogo/', SelecaoJogoView.as_view(), name='selecionar_jogo'),
+    path('jogo/<int:tema_id>/', JogoDaForcaView.as_view(), name='jogo_forca'),
 ]
